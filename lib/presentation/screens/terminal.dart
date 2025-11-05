@@ -19,30 +19,26 @@ class _TerminalState extends State<Terminal> {
     super.initState();
 
     _channel = WebSocketChannel.connect(
-      Uri.parse('ws://localhost:56277/ws'), // vervang door jouw adres
+      Uri.parse('ws://localhost:56277/ws'),
     );
 
-    // Stuur een eerste bericht zodra de verbinding open is
-    _channel.sink.add('Client verbonden: hallo server!');
+    _channel.sink.add('What is the weather in Amsterdam');
 
     _channel.stream.listen(
       (message) {
-        log('Ontvangen: $message');
+        log('Received: $message');
         setState(() {
           _berichten.add(message.toString().trim());
         });
       },
       onError: (error) {
-        log('Fout: $error');
+        log('Error: $error');
         setState(() {
-          _berichten.add('Fout: $error');
+          _berichten.add('Error: $error');
         });
       },
       onDone: () {
-        log('Verbinding gesloten');
-        setState(() {
-          _berichten.add('Verbinding gesloten');
-        });
+        log('Connection closed');
       },
     );
   }
@@ -59,7 +55,7 @@ class _TerminalState extends State<Terminal> {
       backgroundColor: Colors.black,
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Text(_berichten.toString())
+        child: GlowText(_berichten.join(" "))
       ),
     );
   }
