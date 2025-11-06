@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_glow/flutter_glow.dart';
-import 'package:web_socket_channel/web_socket_channel.dart';
-import 'dart:developer';
+import 'package:tars_front_end/core/services/listener.dart';
 
 class Terminal extends StatefulWidget {
   const Terminal({super.key});
@@ -11,42 +10,26 @@ class Terminal extends StatefulWidget {
 }
 
 class _TerminalState extends State<Terminal> {
-  late WebSocketChannel _channel;
   final List<String> _berichten = [];
+  final _service = ListenerService();
 
   @override
   void initState() {
     super.initState();
-
-    _channel = WebSocketChannel.connect(
-      Uri.parse('ws://localhost:56277/ws'),
-    );
-
-    _channel.sink.add('What is the weather in Amsterdam');
-
-    _channel.stream.listen(
-      (message) {
-        log('Received: $message');
-        setState(() {
-          _berichten.add(message.toString().trim());
-        });
+    _service.start(
+      onMessage: (msg) {
+        setState(() => _berichten.add(msg));
       },
-      onError: (error) {
-        log('Error: $error');
-        setState(() {
-          _berichten.add('Error: $error');
-        });
-      },
-      onDone: () {
-        log('Connection closed');
+      onError: (err) {
+        setState(() => _berichten.add('Error: $err'));
       },
     );
   }
 
   @override
   void dispose() {
-    _channel.sink.close();
     super.dispose();
+    _service.dispose();
   }
 
   @override
@@ -55,7 +38,7 @@ class _TerminalState extends State<Terminal> {
       backgroundColor: Colors.black,
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: GlowText(_berichten.join(" "))
+        child: GlowText(_berichten.join(" ")),
       ),
     );
   }
