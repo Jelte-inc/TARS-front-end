@@ -16,14 +16,15 @@ class _TerminalState extends State<Terminal> {
   @override
   void initState() {
     super.initState();
-    _service.start(
-      onMessage: (msg) {
-        setState(() => _berichten.add(msg));
-      },
-      onError: (err) {
-        setState(() => _berichten.add('Error: $err'));
-      },
-    );
+    // _service.startAiWebsocket(
+    //   onMessage: (msg) {
+    //     setState(() => _berichten.add(msg));
+    //   },
+    //   onError: (err) {
+    //     setState(() => _berichten.add('Error: $err'));
+    //   },
+    // );
+    _service.startStreaming();
   }
 
   @override
